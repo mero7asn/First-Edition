@@ -1,7 +1,10 @@
-// Validates UUID format or just passes
+const mongoose = require('mongoose');
+
+// Validates MongoDB ObjectId in route params
 const validateObjectId = (req, res, next) => {
-  // Prisma uses UUIDs or slugs. We can rely on Prisma's built-in validation or check length.
-  // We just let it pass for now.
+  if (req.params.id && !mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return res.status(400).json({ message: 'Invalid ID format' });
+  }
   next();
 };
 

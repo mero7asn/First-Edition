@@ -1,5 +1,5 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const Order = require('../models/Order');
+const Product = require('../models/Product');
 const { sendOrderConfirmation } = require('../utils/email');
 const { safeRegex, pick } = require('../middleware/validate');
 
@@ -9,62 +9,42 @@ exports.createOrder = async (req, res) => {
   try {
     const { items, shippingAddress, billingAddress, payment, pricing, coupon } = req.body;
 
-    // We need to use a transaction to safely check and decrement stock
-    const order = await prisma.$transaction(async (tx) => {
-      // Validate stock and reduce inventory
-      for (const item of items) {
-        const product = await tx.product.findUnique({ where: { id: item.product } });
-        if (!product) throw new Error(`Product not found: ${item.name}`);
-
-        const sizes = product.sizes || [];
-        const sizeIndex = sizes.findIndex(v => v.size === item.size); // assuming color matching if needed
-        
-        if (sizeIndex === -1 || sizes[sizeIndex].stock < item.quantity) {
-          throw new Error(`Insufficient stock for ${product.name}`);
-        }
-
-        sizes[sizeIndex].stock -= item.quantity;
-        
-        await tx.product.update({
-          where: { id: item.product },
-          data: { sizes }
-        });
+    // Validate stock and reduce inventory
+    for (const item of items) {
+      const product = await Product.findById(item.product);
+      const variant = product.variants.find(v => v.size === item.size && v.color === item.color);
+      
+      if (!variant || variant.stock < item.quantity) {
+        return res.status(400).json({ message: `Insufficient stock for ${product.name}` });
       }
 
-      // Create the order
-      const orderNumber = 'FE' + Date.now() + Math.floor(Math.random() * 1000);
-      
-      return await tx.order.create({
-        data: {
-          orderNumber,
-          userId: req.user.id,
-          items,
-          shippingAddress,
-          billingAddress,
-          payment,
-          pricing,
-          coupon
-        }
-      });
+      variant.stock -= item.quantity;
+      product.updateStatus();
+      await product.save();
+    }
+
+    const order = await Order.create({
+      user: req.user._id,
+      items,
+      shippingAddress,
+      billingAddress,
+      payment,
+      pricing,
+      coupon
     });
 
     await sendOrderConfirmation(order, req.user);
 
-    res.status(201).json({ ...order, _id: order.id });
+    res.status(201).json(order);
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
 exports.getMyOrders = async (req, res) => {
   try {
-    const orders = await prisma.order.findMany({
-      where: { userId: req.user.id },
-      orderBy: { createdAt: 'desc' }
-    });
-    
-    // Convert id to _id for frontend compatibility
-    res.json(orders.map(o => ({ ...o, _id: o.id })));
+    const orders = await Order.find({ user: req.user._id }).populate('items.product').sort({ createdAt: -1 });
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -72,20 +52,17 @@ exports.getMyOrders = async (req, res) => {
 
 exports.getOrder = async (req, res) => {
   try {
-    const order = await prisma.order.findUnique({
-      where: { id: req.params.id },
-      include: { user: { select: { name: true, email: true } } }
-    });
+    const order = await Order.findById(req.params.id).populate('items.product user');
     
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    if (order.userId !== req.user.id && req.user.role === 'customer') {
+    if (order.user._id.toString() !== req.user._id.toString() && req.user.role === 'customer') {
       return res.status(403).json({ message: 'Access denied' });
     }
 
-    res.json({ ...order, _id: order.id });
+    res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -94,23 +71,13 @@ exports.getOrder = async (req, res) => {
 exports.getAllOrders = async (req, res) => {
   try {
     const { status, search } = req.query;
-    const where = {};
+    const filter = {};
     
-    if (status) where.status = status;
-    if (search) {
-      where.orderNumber = {
-        contains: safeRegex(search),
-        mode: 'insensitive'
-      };
-    }
+    if (status) filter.status = status;
+    if (search) filter.orderNumber = { $regex: safeRegex(search), $options: 'i' };
 
-    const orders = await prisma.order.findMany({
-      where,
-      include: { user: { select: { name: true, email: true } } },
-      orderBy: { createdAt: 'desc' }
-    });
-    
-    res.json(orders.map(o => ({ ...o, _id: o.id })));
+    const orders = await Order.find(filter).populate('user items.product').sort({ createdAt: -1 });
+    res.json(orders);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -119,31 +86,25 @@ exports.getAllOrders = async (req, res) => {
 exports.updateOrderStatus = async (req, res) => {
   try {
     const { status, trackingNumber, adminNotes } = pick(req.body, ALLOWED_ORDER_UPDATE);
-    
-    const order = await prisma.order.findUnique({ where: { id: req.params.id } });
+    const order = await Order.findById(req.params.id);
 
     if (!order) {
       return res.status(404).json({ message: 'Order not found' });
     }
 
-    const data = {};
-    if (status) data.status = status;
-    if (trackingNumber) data.trackingNumber = trackingNumber;
-    if (adminNotes) data.adminNotes = adminNotes;
+    if (status) order.status = status;
+    if (trackingNumber) order.trackingNumber = trackingNumber;
+    if (adminNotes) order.adminNotes = adminNotes;
 
     if (status === 'shipped' && !order.shippedAt) {
-      data.shippedAt = new Date();
+      order.shippedAt = Date.now();
     }
     if (status === 'delivered' && !order.deliveredAt) {
-      data.deliveredAt = new Date();
+      order.deliveredAt = Date.now();
     }
 
-    const updatedOrder = await prisma.order.update({
-      where: { id: req.params.id },
-      data
-    });
-
-    res.json({ ...updatedOrder, _id: updatedOrder.id });
+    await order.save();
+    res.json(order);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -151,29 +112,19 @@ exports.updateOrderStatus = async (req, res) => {
 
 exports.getOrderStats = async (req, res) => {
   try {
-    const totalOrders = await prisma.order.count();
-    
-    // Prisma aggregate
-    // Since payment is JSON in Prisma, we have to fetch and sum manually if the database doesn't support JSON aggregations natively
-    const paidOrders = await prisma.order.findMany();
-    
-    const totalRevenue = paidOrders
-      .filter(o => o.payment && o.payment.status === 'paid')
-      .reduce((sum, o) => sum + (o.pricing?.total || 0), 0);
+    const totalOrders = await Order.countDocuments();
+    const totalRevenue = await Order.aggregate([
+      { $match: { 'payment.status': 'paid' } },
+      { $group: { _id: null, total: { $sum: '$pricing.total' } } }
+    ]);
 
-    const statusCounts = paidOrders.reduce((acc, order) => {
-      acc[order.status] = (acc[order.status] || 0) + 1;
-      return acc;
-    }, {});
-    
-    const ordersByStatus = Object.keys(statusCounts).map(status => ({
-      _id: status,
-      count: statusCounts[status]
-    }));
+    const ordersByStatus = await Order.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } }
+    ]);
 
     res.json({
       totalOrders,
-      totalRevenue,
+      totalRevenue: totalRevenue[0]?.total || 0,
       ordersByStatus
     });
   } catch (error) {
