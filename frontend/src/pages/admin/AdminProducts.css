@@ -1,0 +1,132 @@
+/* ─── Admin Products Table ─────────────────────────────── */
+.admin-products {
+  padding: 3rem 0 5rem;
+  min-height: 70vh;
+  background: var(--ivory);
+}
+
+.products-table {
+  background: var(--white);
+  border: 1px solid var(--border);
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: var(--dark-charcoal);
+  color: var(--white);
+}
+
+th {
+  padding: 1rem 1.25rem;
+  text-align: left;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+thead tr th:first-child {
+  border-left: 2px solid var(--main-gold);
+}
+
+td {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+  color: var(--text-dark);
+  vertical-align: middle;
+}
+
+tbody tr { transition: background-color 0.2s ease; }
+tbody tr:hover { background-color: var(--surface); }
+
+.product-thumb {
+  width: 52px;
+  height: 66px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  display: block;
+}
+
+/* Status badges */
+.status-badge {
+  padding: 0.25rem 0.7rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.status-badge.available {
+  background: rgba(31, 168, 85, 0.08);
+  color: var(--whatsapp);
+  border: 1px solid rgba(31, 168, 85, 0.22);
+}
+
+.status-badge.unavailable {
+  background: rgba(192, 57, 43, 0.06);
+  color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.2);
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.btn-edit,
+.btn-toggle,
+.btn-delete {
+  padding: 0.35rem 0.8rem;
+  border: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-edit { background: var(--main-gold); color: var(--white); }
+.btn-edit:hover { background: var(--dark-gold); }
+
+.btn-toggle {
+  background: transparent;
+  color: var(--text-dark);
+  border: 1px solid var(--border);
+}
+
+.btn-toggle:hover {
+  border-color: var(--text-heading);
+  background: var(--text-heading);
+  color: var(--white);
+}
+
+.btn-delete {
+  background: transparent;
+  color: #c0392b;
+  border: 1px solid rgba(192, 57, 43, 0.3);
+}
+
+.btn-delete:hover {
+  background: #c0392b;
+  color: var(--white);
+  border-color: #c0392b;
+}
+
+@media (max-width: 768px) {
+  th, td { padding: 0.75rem; }
+  .action-buttons { flex-direction: column; }
+}

@@ -1,0 +1,332 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* ── Luxurious Light Palette (Ivory/Gold) ──────── */
+  --bg-color: #FCFBF8;       /* soft pearl/ivory background */
+  --surface: #FFFFFF;        /* crisp white surface */
+  --surface-alt: #F4F1EA;    /* slightly warmer cream for cards */
+  
+  /* ── Vibrant Gold Accents ──────────────────────── */
+  --main-gold: #C8A45D;      /* refined elegant gold */
+  --light-gold: #E7D4A8;
+  --deep-gold: #B4883B;
+  --dark-gold: #8E6826;
+  --metallic-gold: #D8BC7A;
+
+  /* ── Type ─────────────────────────────────────── */
+  --text-heading: #1A1612;   /* rich dark espresso for headings */
+  --text-dark: #2C2416;      /* warm deep-brown body text */
+  --text-mid: #5C4E38;
+  --text-light: #9C8C78;
+
+  /* ── Borders & Shadows ────────────────────────── */
+  --border: rgba(142, 104, 38, 0.15);
+  --border-strong: rgba(200, 164, 93, 0.4);
+  
+  --shadow-sm: 0 4px 15px rgba(142, 104, 38, 0.08);
+  --shadow-md: 0 10px 30px rgba(142, 104, 38, 0.12);
+  --shadow-gold: 0 12px 35px rgba(200, 164, 93, 0.2);
+
+  /* ── Gold Gradient ────────────────────────────── */
+  --gold-gradient: linear-gradient(
+    135deg,
+    var(--deep-gold) 0%,
+    var(--main-gold) 45%,
+    var(--light-gold) 75%,
+    var(--main-gold) 100%
+  );
+  
+  /* ── Light Glassmorphism ──────────────────────── */
+  --glass-bg: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(255, 255, 255, 0.4);
+
+  /* ── Extras ───────────────────────────────────── */
+  --ivory: #FAFAF8;
+  --dark-charcoal: #1A1614;
+  --white: #FFFFFF;
+  --gray-bg: #F8F8F8;
+}
+
+/* ─── Base ──────────────────────────────────────── */
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-color);
+  color: var(--text-dark);
+  line-height: 1.7;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  transition: background-color 0.3s ease;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app > main { flex: 1; }
+
+/* ─── Typography ────────────────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 600;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  letter-spacing: 0.02em;
+  color: var(--text-heading);
+}
+
+h1 { font-size: 3.5rem; font-weight: 700; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+h2 { font-size: 2.75rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+
+a {
+  text-decoration: none;
+  color: inherit;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+a:hover {
+  color: var(--main-gold);
+}
+
+button {
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+}
+
+/* ─── Layout ────────────────────────────────────── */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.section { padding: 5.5rem 0; }
+
+.grid         { display: grid; gap: 2rem; }
+.grid-2       { grid-template-columns: repeat(2, 1fr); }
+.grid-3       { grid-template-columns: repeat(3, 1fr); }
+.grid-4       { grid-template-columns: repeat(4, 1fr); }
+
+/* ─── Buttons ───────────────────────────────────── */
+.btn {
+  padding: 0.9rem 2.25rem;
+  border: none;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition: all 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.btn-primary {
+  background: var(--gold-gradient);
+  background-size: 200% auto;
+  color: var(--surface);
+  font-weight: 700;
+  box-shadow: 0 4px 15px rgba(200, 164, 93, 0.3);
+}
+
+.btn-primary:hover {
+  background-position: right center;
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(200, 164, 93, 0.5);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--main-gold);
+  color: var(--main-gold);
+}
+
+.btn-outline:hover {
+  background: var(--main-gold);
+  color: var(--surface);
+  box-shadow: 0 4px 15px rgba(200, 164, 93, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ─── Form Elements ─────────────────────────────── */
+.form-group {
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  font-size: 0.85rem;
+  color: var(--text-mid);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+select,
+textarea {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text-heading);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--text-light);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--main-gold);
+  background-color: var(--surface);
+  box-shadow: 0 0 0 4px rgba(200, 164, 93, 0.1);
+}
+
+/* ─── Utilities ─────────────────────────────────── */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+  border-radius: 12px;
+}
+
+/* ─── Loading ───────────────────────────────────── */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 2rem;
+  color: var(--main-gold);
+  font-style: italic;
+  letter-spacing: 0.05em;
+  animation: pulse 1.6s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.4; text-shadow: 0 0 0 rgba(200, 164, 93, 0); }
+  50%       { opacity: 1;   text-shadow: 0 0 15px rgba(200, 164, 93, 0.3); }
+}
+
+/* ─── Scrollbar ─────────────────────────────────── */
+::-webkit-scrollbar       { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--surface-alt); border-radius: 4px; border: 1px solid var(--border); }
+::-webkit-scrollbar-thumb:hover { background: var(--main-gold); }
+
+/* ─── Responsive ────────────────────────────────── */
+@media (max-width: 1024px) {
+  .grid-4 { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 768px) {
+  .container { padding: 0 1.25rem; }
+  .section   { padding: 3.5rem 0; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  h1 { font-size: 2.25rem; }
+  h2 { font-size: 1.9rem; }
+}
+
+@media (max-width: 480px) {
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SCREEN-CAPTURE / SCREENSHOT PROTECTION
+   ═══════════════════════════════════════════════════════════════════════════
+   These rules work alongside the JS useScreenProtection hook to make it as
+   difficult as possible to take clean screenshots or record video of this app.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* 1. Disable text selection globally (defeats Ctrl+A + screenshot combos)   */
+*,
+*::before,
+*::after {
+  -webkit-user-select:     none !important;   /* Chrome / Safari / Edge  */
+  -moz-user-select:        none !important;   /* Firefox                 */
+  -ms-user-select:         none !important;   /* IE / old Edge           */
+  user-select:             none !important;
+
+  /* Suppress mobile blue highlight on tap that can reveal content bounds  */
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 2. Keep form inputs selectable (UX requirement – users must type)         */
+input,
+textarea,
+[contenteditable="true"] {
+  -webkit-user-select: text !important;
+  -moz-user-select:    text !important;
+  user-select:         text !important;
+}
+
+/* 3. Prevent images / media from being dragged off the page                */
+img,
+video,
+canvas,
+iframe {
+  -webkit-user-drag:   none;
+  user-drag:           none;
+  pointer-events:      none;  /* images have no interaction need – overlays handle UI */
+}
+
+/* 4. Print blackout – the entire page prints as blank                      */
+@media print {
+  html, body, * {
+    display:    none !important;
+    visibility: hidden !important;
+    background: #000 !important;
+    color:      #000 !important;
+  }
+  body::before {
+    content:    '' !important;
+    display:    block !important;
+    position:   fixed !important;
+    inset:      0 !important;
+    background: #000 !important;
+  }
+}
+
+/* 5. Extra: force-black any CSS-screenshot utilities that rely on
+      rendering with media=screen while injecting print styles              */
+@media screen {
+  .no-capture {
+    filter: blur(8px);
+    transition: filter 0.2s ease;
+  }
+  .no-capture:focus-within {
+    filter: none;
+  }
+}
+

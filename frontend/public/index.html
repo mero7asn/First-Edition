@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta name="description" content="First Edition - Limited Edition Premium T-Shirts" />
+    <!-- Prevent caching of page source -->
+    <meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
+    <!-- Block referrer leaking -->
+    <meta name="referrer" content="no-referrer" />
+    <link rel="icon" href="%PUBLIC_URL%/logo.png" />
+    <title>First Edition | Limited Edition T-Shirts</title>
+    <style>
+      /* Block text selection site-wide */
+      * {
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        -webkit-touch-callout: none !important;
+      }
+      /* Allow selection only inside input/textarea fields */
+      input, textarea {
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        -ms-user-select: text !important;
+        user-select: text !important;
+      }
+      /* Hide content when printing */
+      @media print {
+        html, body { display: none !important; visibility: hidden !important; }
+      }
+      /* Disable image dragging */
+      img { pointer-events: none; -webkit-user-drag: none; user-drag: none; }
+    </style>
+    <!-- DevTools & inspect protection — must load before everything else -->
+    <script src="%PUBLIC_URL%/devtools-block.js"></script>
+    <!-- Screenshot & recording detection -->
+    <script src="%PUBLIC_URL%/screenshot-block.js"></script>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+  </body>
+</html>
