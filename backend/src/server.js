@@ -2,7 +2,6 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
-const connectDB = require('./config/database');
 const errorHandler = require('./middleware/errorHandler');
 const sanitize = require('./middleware/sanitize');
 const { signResponse, verifyRequest } = require('./middleware/integrity');
@@ -21,8 +20,7 @@ const app = express();
 // Trust only the first proxy (e.g. Nginx / load balancer)
 app.set('trust proxy', 1);
 
-// Connect Database
-connectDB();
+// Database is connected lazily via Prisma Client
 
 // Security headers
 app.use(helmet({
